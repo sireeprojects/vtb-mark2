@@ -26,6 +26,7 @@ SRCS_LIST := logger.cpp \
 				 common.cpp \
 				 signals.cpp \
 				 cmdline.cpp \
+				 config.cpp \
              vtb.cpp
 
 # Prepend the source directory to the listed files[cite: 4]
