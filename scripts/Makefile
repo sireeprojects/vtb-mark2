@@ -78,14 +78,16 @@ purge:
 	rm -rf /dev/hugepages/v*
 
 run:
-	@./vtb -l 1-2 --file-prefix=vhost_backend --no-pci --no-telemetry \
+	@./vtb -l 10-11 --file-prefix=vhost_backend --no-pci --no-telemetry \
 			--log-level=lib.vhost.config:3 \
 			--log-level=lib.vhost:error \
 			--log-level=pmd.net.vhost:error \
 			--log-level=lib.eal:3 \
 			--log-level=lib.ring:8 \
 			--log-level=lib.mempool:8 \
-			--huge-unlink
+			--huge-unlink \
+			-- \
+			--verbosity Info
 
 # Run command for DPDK environment[cite: 4]
 oldrun:

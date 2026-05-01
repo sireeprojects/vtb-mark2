@@ -14,19 +14,20 @@
 namespace vtb {
 
 void signal_handler([[maybe_unused]] int signal) {
-    vtb::Logger::get_instance().direct_append(
-          "[VTBMAIN] Signal caught. Starting shutdown...\n");
-    
-    // Stop the producers first so no new logs are generated
-    keep_running = false;
-
-    // shutdown Logger
-    vtb::Logger::get_instance().shutdown();
-    std::exit(0); // 0 - pretend normal exit of program
+   vtb::Logger::get_instance().direct_append(
+         "[VTBMAIN] Signal caught. Starting shutdown...\n");
+   
+   // Stop the producers first so no new logs are generated
+   keep_running = false;
+   
+   // shutdown Logger
+   vtb::Logger::get_instance().shutdown();
+   vtb::restore_echoctl();
+   std::exit(0);
 }
 
 int keep_alive_thread(void*) {
-   while (!keep_running) {
+   while (keep_running) {
       rte_pause();
    }
    return 0;

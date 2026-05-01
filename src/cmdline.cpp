@@ -7,10 +7,9 @@
 namespace vtb {
 
 void CmdlineParser::add_argument(std::string_view long_n,
-                                 std::string_view short_n,
                                  std::string_view desc, bool req,
                                  std::string_view default_v) {
-   arguments_.push_back({std::string(long_n), std::string(short_n),
+   arguments_.push_back({std::string(long_n),
                          std::string(desc), req, false,
                          std::string(default_v)});
 }
@@ -41,7 +40,7 @@ void CmdlineParser::parse(int argc, char** argv) {
       std::string_view token(argv[i]);
       bool matched = false;
       for (auto& arg : arguments_) {
-         if (token == arg.long_name || token == arg.short_name) {
+         if (token == arg.long_name) {
             arg.found = true;
             matched = true;
 
@@ -75,13 +74,11 @@ void CmdlineParser::parse(int argc, char** argv) {
 
 void CmdlineParser::print_usage() const {
    std::cout << "\nUsage: ./app [EAL options] -- [APP options]\n\n";
-   std::cout << std::left << std::setw(25) << "Long Flag" << std::setw(10)
-             << "Short" << std::setw(55) << "Description" << "Required\n";
+   std::cout << std::left << std::setw(25) << "Long Flag" << std::setw(55) << "Description" << "Required\n";
    std::cout << std::string(100, '-') << "\n";
 
    for (const auto& arg : arguments_) {
-      std::cout << std::left << std::setw(25) << arg.long_name << std::setw(10)
-                << arg.short_name << std::setw(55) << arg.description
+      std::cout << std::left << std::setw(25) << arg.long_name << std::setw(55) << arg.description
                 << (arg.required ? "Yes" : "No") << "\n";
    }
    std::cout << std::endl;
@@ -90,7 +87,7 @@ void CmdlineParser::print_usage() const {
 template <>
 std::string CmdlineParser::get<std::string>(std::string_view name) const {
    for (const auto& arg : arguments_) {
-      if (arg.long_name == name || arg.short_name == name) return arg.value;
+      if (arg.long_name == name) return arg.value;
    }
    return "";
 }
