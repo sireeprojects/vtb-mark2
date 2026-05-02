@@ -89,6 +89,27 @@ run:
 			-- \
 			--verbosity Info
 
+# Run with vdevs			
+rund:
+	@./vtb -l 10-11 --file-prefix=vhost_backend --no-pci --no-telemetry \
+			--log-level=lib.vhost.config:3 \
+			--log-level=lib.vhost:error \
+			--log-level=pmd.net.vhost:error \
+			--log-level=lib.eal:3 \
+			--log-level=lib.ring:8 \
+			--log-level=lib.mempool:8 \
+			--huge-unlink \
+			--vdev 'net_vhost0,iface=/tmp/vhost-user0,queues=1' \
+			--vdev 'net_vhost1,iface=/tmp/vhost-user1,queues=2' \
+			--vdev 'net_vhost2,iface=/tmp/vhost-user2,queues=3' \
+			--vdev 'net_vhost3,iface=/tmp/vhost-user3,queues=4' \
+			--vdev 'net_vhost4,iface=/tmp/vhost-user4,queues=5' \
+			--vdev 'net_vhost5,iface=/tmp/vhost-user5,queues=6' \
+			--vdev 'net_vhost6,iface=/tmp/vhost-user6,queues=7' \
+			--vdev 'net_vhost7,iface=/tmp/vhost-user7,queues=8' \
+			-- \
+			--verbosity Info
+
 # Run command for DPDK environment[cite: 4]
 oldrun:
 	@./vtb -l 1-2 --file-prefix=vhost_backend --no-pci --no-telemetry \
