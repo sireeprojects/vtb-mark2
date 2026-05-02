@@ -74,8 +74,16 @@ clean:
 	rm -rf $(OBJ_DIR) $(TARGET) *.log
 
 purge:
-	rm -rf /tmp/vhost-user.sock
+	rm -rf /tmp/vhost-user*
 	rm -rf /dev/hugepages/v*
+
+# Run with vdevs			
+one:
+	@./vtb -l 10-11 --file-prefix=vhost_backend --no-pci --no-telemetry \
+			--huge-unlink \
+			--vdev 'net_vhost0,iface=/tmp/vhost-user0,queues=1' \
+			-- \
+			--verbosity Info
 
 run:
 	@./vtb -l 10-11 --file-prefix=vhost_backend --no-pci --no-telemetry \

@@ -208,9 +208,9 @@ void process_vdevs() {
    }
 
 
-   RTE_ETH_FOREACH_DEV(port_id) {
-      shutdown_dpdk_port(port_id);
-   }
+   // RTE_ETH_FOREACH_DEV(port_id) {
+   //    shutdown_dpdk_port(port_id);
+   // }
 }
 
 int main(int argc, char** argv) {
