@@ -15,6 +15,43 @@
 #define NUM_MBUFS 8191
 #define MBUF_CACHE_SIZE 250
 
+/* 
+ * port_id: The ID of the port that changed status
+ * type:    The event type (RTE_ETH_EVENT_INTR_LSC)
+ * param:   A pointer to any custom data you passed during registration
+ * ret_param: Reserved for future use
+ */
+static int
+vhost_lsc_callback(uint16_t port_id, enum rte_eth_event_type type, void *param, void *ret_param)
+{
+    struct rte_eth_link link;
+    int ret;
+
+    // We don't care about other events here
+    if (type != RTE_ETH_EVENT_INTR_LSC)
+        return 0;
+
+    // Get the new link status
+    ret = rte_eth_link_get_nowait(port_id, &link);
+    if (ret < 0) {
+        // printf("Port %u: Failed to get link status\n", port_id);
+        VTB_LOG(ERROR) << "Port Failed to get link status: " << port_id;
+        return ret;
+    }
+
+    if (link.link_status == RTE_ETH_LINK_UP) {
+        // printf("\n[EVENT] Port %u: VM Connected (Link UP). Speed: %u Mbps\n", port_id, link.link_speed);
+        VTB_LOG(INFO) << "Port Connected: " << port_id << " With linkspeed: " << link.link_speed;
+        // You could set a global flag here to start polling this port
+    } else {
+        // printf("\n[EVENT] Port %u: VM Disconnected (Link DOWN)\n", port_id);
+        VTB_LOG(INFO) << "Port Disconnected: " << port_id;
+        // You could set a flag here to stop polling this port
+    }
+
+    return 0;
+}
+
 int initialize_dpdk_port(uint16_t port_id) {
     struct rte_eth_conf port_conf;
     struct rte_eth_dev_info dev_info;
@@ -24,6 +61,13 @@ int initialize_dpdk_port(uint16_t port_id) {
 
     // 1. Zero out the configuration structure to avoid -Wmissing-field-initializers
     memset(&port_conf, 0, sizeof(struct rte_eth_conf));
+    port_conf.intr_conf.lsc = 1;
+
+   // struct rte_eth_conf port_conf = {
+   //    .intr_conf = {
+   //       .lsc = 1, // Enable Link Status Change interrupts
+   //    },
+   // };
 
     // 2. Query device capabilities and current configuration (queues)
     ret = rte_eth_dev_info_get(port_id, &dev_info);
@@ -89,6 +133,9 @@ int initialize_dpdk_port(uint16_t port_id) {
             return ret;
         }
     }
+
+    // Register the LSC callback for this specific port
+    rte_eth_dev_callback_register(port_id, RTE_ETH_EVENT_INTR_LSC, vhost_lsc_callback, NULL);
 
     // 8. Start the Device
     ret = rte_eth_dev_start(port_id);
